@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <link rel="stylesheet" href="../css/style.css">
+    <script type="text/javascript" src="../src/data_helpers.js"></script>
+
+    <script>
+        function calculate(outputResultId, slidingWindowLength = 1) {
+            var numberOfIncreases = 0;
+            var lines = splitTextarea("input-text");
+
+            var slidingWindow = [];
+            for (const measurementString of lines) {
+                                console.log(previousWindowSum);
+                var currentMeasurement = parseInt(measurementString);
+                
+                if (slidingWindow.length == slidingWindowLength) {
+                    var previousWindowSum = slidingWindow.reduce(add, 0);
+                    slidingWindow.shift();
+                    slidingWindow.push(currentMeasurement);
+                    var currentWindowSum = slidingWindow.reduce(add, 0);
+
+                    if (currentWindowSum > previousWindowSum) numberOfIncreases++;
+                } else {
+                    slidingWindow.push(currentMeasurement);
+                }
+            }
+
+            var partOneResultText = document.getElementById(outputResultId);
+            partOneResultText.innerText = numberOfIncreases;
+        }
+
+        function add(accumulator, a) {
+            return accumulator + a;
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Day one</h1>
+    <p>Challenge can be found <a href="https://adventofcode.com/2021/day/1">here</a>.</p>
+
+    <label for="input-text" name="input-text" rows="20" cols="50">Paste the input here:</label>
+    <textarea id="input-text"></textarea>
+
+    <h2>Part one</h2>
+    <p>We need to calculate how many of the new measurements are larger than the previous measurement.</p>
+    <button id="part-one-button" name="part-one-button" onclick="calculate('part-one-result')">Calculate</button>
+    <p>Result:</p>
+    <p class="result" id="part-one-result">Not calculated yet</p>
+
+    <h2>Part two</h2>
+    <p>Now we have to look at the sliding windows of 3 measurements to determine if they are larger than previous
+        sliding windows.</p>
+    <button id="part-two-button" name="part-two-button" onclick="calculate('part-two-result', 3)">Calculate</button>
+    <p>Result:</p>
+    <p class="result" id="part-two-result">Not calculated yet</p>
+</body>
+
+</html>

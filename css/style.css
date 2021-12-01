@@ -1,0 +1,8 @@
+label {display:block;}
+textarea { display:block;}
+
+.result {
+    font-weight: 700;
+    color:darkolivegreen;
+    font-size: 20px;
+}
