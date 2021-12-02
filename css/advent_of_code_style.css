@@ -338,9 +338,7 @@ body {
   .share .share-content:before {
     content: "\00a0";
   }
-  .share .share-content:after {
-    /*content: "]";*/
-  }
+  
   .share:hover .share-content, .share:focus-within .share-content {
     max-width: 45em;
     transition: max-width .2s 0s;
