@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <link rel="stylesheet" href="../css/advent_of_code_style.css">
+    <script type="text/javascript" src="../src/data_helpers.js"></script>
+
+    <script>
+        function calculate(outputResultId, includeAim = false) {
+            var horizontal_position = 0;
+            var depth = 0;
+            var aim = 0;
+            var lines = splitTextarea("input-text");
+
+            for (const command of lines) {
+                const lineSegments = command.split(" ");
+                var direction = lineSegments[0];
+                var distance = parseInt(lineSegments[1]);
+
+                switch (direction) {
+                    case "forward":
+                        horizontal_position += distance;
+                        if (includeAim) {
+                            depth += aim * distance;
+                        }
+                        break;
+                    case "down":
+                        if (includeAim) {
+                            aim += distance;
+                        } else {
+                            depth += distance;
+                        }
+                        break;
+                    case "up":
+                        if (includeAim) {
+                            aim -= distance;
+                        } else {
+                            depth -= distance;
+                        }
+                        break;
+                }
+            }
+
+            var result = document.getElementById(outputResultId);
+            result.innerText = horizontal_position * depth;
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Day two</h1>
+    <p>Challenge can be found <a href="https://adventofcode.com/2021/day/2">here</a>.</p>
+
+    <label for="input-text" name="input-text" rows="20" cols="50">Paste the input here:</label>
+    <textarea id="input-text"></textarea>
+
+    <h2>Part one</h2>
+    <p>We will ultimately end up with the horizontal distance multiplied by the depth.</p>
+    <button id="part-one-button" name="part-one-button" onclick="calculate('part-one-result')">Calculate</button>
+    <p>Result:</p>
+    <p class="result" id="part-one-result">Not calculated yet</p>
+
+    <h2>Part two</h2>
+    <p>Now we have to also account for "aim".</p>
+    <button id="part-two-button" name="part-two-button" onclick="calculate('part-two-result', true)">Calculate</button>
+    <p>Result:</p>
+    <p class="result" id="part-two-result">Not calculated yet</p>
+</body>
+
+</html>
