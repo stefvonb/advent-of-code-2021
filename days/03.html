@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <link rel="stylesheet" href="../css/advent_of_code_style.css">
+    <script type="text/javascript" src="../src/data_helpers.js"></script>
+
+    <script>
+        function calculatePartOne() {
+            var binaryInputs = getBinaryInputs();
+            var bitCounts = new Array(binaryInputs[0].length).fill(0);
+
+            for (const binaryInput of binaryInputs) {
+                bitCounts = addBinary(bitCounts, binaryInput);
+            }
+
+            var gammaRate = [];
+            var epsilonRate = [];
+
+            var totalInputs = binaryInputs.length;
+
+            for (var i = 0; i < bitCounts.length; i++) {
+                var numberOfOnes = bitCounts[i];
+                var numberOfZeroes = totalInputs - numberOfOnes;
+
+                if (numberOfOnes > numberOfZeroes) {
+                    gammaRate.push(1);
+                    epsilonRate.push(0);
+                } else {
+                    gammaRate.push(0);
+                    epsilonRate.push(1);
+                }
+            }
+
+            var decimalGamma = binaryToInt(gammaRate);
+            var decimalEpsilon = binaryToInt(epsilonRate);
+
+            var result = document.getElementById('part-one-result');
+            result.innerText = decimalGamma * decimalEpsilon;
+        }
+
+        function calculatePartTwo() {
+            var binaryInputs = getBinaryInputs();
+
+            const inputLength = binaryInputs[0].length;
+
+            var oxygenRatingCandidates = [...binaryInputs];      
+            var bitInQuestion = 0;
+            while (oxygenRatingCandidates.length > 1) {
+                var sumOfBits = 0;
+                for (const binaryInput of oxygenRatingCandidates) {
+                    sumOfBits += binaryInput[bitInQuestion];
+                }
+
+                var totalOxygenCandidates = oxygenRatingCandidates.length;
+                var mostCommonBit = sumOfBits >= totalOxygenCandidates - sumOfBits ? 1 : 0;
+                oxygenRatingCandidates = oxygenRatingCandidates.filter(binaryInput => binaryInput[bitInQuestion] == mostCommonBit);
+
+                bitInQuestion++;
+            }
+            console.log(oxygenRatingCandidates[0]);
+
+            var c02RatingCandidates = [...binaryInputs];
+            bitInQuestion = 0;
+            while (c02RatingCandidates.length > 1) {
+                var sumOfBits = 0;
+                for (const binaryInput of c02RatingCandidates) {
+                    sumOfBits += binaryInput[bitInQuestion];
+                }
+
+                var totalC02Candidates = c02RatingCandidates.length;
+                var leastCommonBit = sumOfBits >= totalC02Candidates - sumOfBits ? 0 : 1;
+                c02RatingCandidates = c02RatingCandidates.filter(binaryInput => binaryInput[bitInQuestion] == leastCommonBit);
+
+                bitInQuestion++;
+            }
+            console.log(c02RatingCandidates[0]);
+
+            var result = document.getElementById('part-two-result');
+            result.innerText = binaryToInt(oxygenRatingCandidates[0]) * binaryToInt(c02RatingCandidates[0]);
+        }
+
+        function getBinaryInputs() {
+            var binaryInputs = [];
+
+            var lines = splitTextarea("input-text");
+
+            for (const binaryInput of lines) {
+                var newBinaryInput = [];
+                for (var i = 0; i < binaryInput.length; i++) {
+                    var bitValue = parseInt(binaryInput[i]);
+                    newBinaryInput.push(bitValue);
+                }
+                binaryInputs.push(newBinaryInput);
+            }
+
+            return binaryInputs;
+        }
+
+        function binaryToInt(binaryArray) {
+            var returnValue = 0;
+            for (var i = 0; i < binaryArray.length; i++) {
+                var powerToRaise = binaryArray.length - 1 - i;
+                returnValue += binaryArray[i] * Math.pow(2, powerToRaise);
+            }
+            return returnValue;
+        }
+
+        function addBinary(a, b) {
+            return a.map((e, i) => e + b[i]);
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Day three</h1>
+    <p>Challenge can be found <a href="https://adventofcode.com/2021/day/3">here</a>.</p>
+
+    <label for="input-text" name="input-text" rows="20" cols="50">Paste the input here:</label>
+    <textarea id="input-text"></textarea>
+
+    <h2>Part one</h2>
+    <p>The power consumption is the product of the "gamma" and "epsilon" rates.</p>
+    <button id="part-one-button" name="part-one-button" onclick="calculatePartOne()">Calculate</button>
+    <p>Result:</p>
+    <p class="result" id="part-one-result">Not calculated yet</p>
+
+    <h2>Part two</h2>
+    <p>Determine the oxygen and C02 ratings.</p>
+    <button id="part-two-button" name="part-two-button" onclick="calculatePartTwo()">Calculate</button>
+    <p>Result:</p>
+    <p class="result" id="part-two-result">Not calculated yet</p>
+</body>
+
+</html>
