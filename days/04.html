@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <link rel="stylesheet" href="../css/advent_of_code_style.css">
+    <script type="text/javascript" src="../src/data_helpers.js"></script>
+
+    <script>
+        function calculatePartOne() {
+            var inputLines = splitTextarea('input-text');
+
+            var playOrder = inputLines[0].split(",").map(Number);
+
+            // Load all the bingo boards
+            var bingoBoards = getBingoBoards(inputLines);
+
+            // Now play through the game
+            for (const play of playOrder) {
+                for (const bingoBoard of bingoBoards) {
+                    bingoBoard.markPlay(play);
+
+                    // Check if the board won
+                    if (bingoBoard.wins()) {
+                        console.log("Found a winner!")
+                        console.log(bingoBoard);
+
+                        var result = document.getElementById('part-one-result');
+                        result.innerText = bingoBoard.score(play);
+
+                        return;
+                    }
+                }
+            }
+        }
+
+        function calculatePartTwo() {
+            var inputLines = splitTextarea('input-text');
+
+            var playOrder = inputLines[0].split(",").map(Number);
+
+            // Load all the bingo boards
+            var bingoBoards = getBingoBoards(inputLines);
+
+            // Now play through the game
+            winningBoards = [];
+            var lastWinningPlay = 0;
+
+            for (const play of playOrder) {
+                var winningBoardsToRemove = [];
+
+                for (var i = 0; i < bingoBoards.length; i++) {
+                    bingoBoards[i].markPlay(play);
+
+                    // Check if the board won
+                    if (bingoBoards[i].wins()) {
+                        winningBoards.push(bingoBoards[i]);
+                        winningBoardsToRemove.push(i);
+                        lastWinningPlay = play;
+                    }
+                }
+                winningBoardsToRemove.sort(function(a, b){ return b - a; });
+                
+                for (var i = 0; i < winningBoardsToRemove.length; i++)
+                    bingoBoards.splice(winningBoardsToRemove[i], 1);
+            }
+
+            var result = document.getElementById('part-two-result');
+            result.innerText = winningBoards[winningBoards.length - 1].score(lastWinningPlay);
+        }
+
+        function getBingoBoards(puzzleInput) {
+            var bingoBoards = [];
+
+            var boardBuffer = [];
+            for (var i = 1; i < puzzleInput.length; i++) {
+                var currentLine = puzzleInput[i].trim();
+
+                if (currentLine == "") {
+                    if (boardBuffer.length > 0) {
+                        bingoBoards.push(new BingoBoard(boardBuffer));
+                        boardBuffer = [];
+                    }
+                } else {
+                    var row = currentLine.split(/[ ,]+/);
+                    boardBuffer.push(row);
+                }
+            }
+
+            bingoBoards.push(new BingoBoard(boardBuffer));
+            return bingoBoards;
+        }
+
+        class BingoBoard {
+            constructor(stringInputs) {
+                this.contents = [];
+                for (const row of stringInputs) {
+                    for (const column of row) {
+                        this.contents.push(parseInt(column));
+                    }
+                }
+
+                this.markedPoints = new Array(this.contents.length).fill(0);
+            }
+
+            markPlay(playNumber) {
+                var indexOfPlay = this.contents.indexOf(playNumber);
+                if (indexOfPlay >= 0) this.markedPoints[indexOfPlay] = 1;
+            }
+
+            wins() {
+                var scoreOnRow = 0;
+                var scoreOnColumns = new Array(5).fill(0);
+                for (var i = 0; i < this.markedPoints.length; i++) {
+                    if (i % 5 == 0) scoreOnRow = 0;
+                    scoreOnRow += this.markedPoints[i];
+
+                    var rowNumber = Math.floor(i / 5);
+                    var columnNumber = i - 5 * rowNumber;
+                    scoreOnColumns[columnNumber] += this.markedPoints[i];
+
+                    if (scoreOnRow == 5 || scoreOnColumns[columnNumber] == 5) return true;
+                }
+
+                return false;
+            }
+
+            score(lastPlay) {
+                var bareScore = 0;
+
+                for (var i = 0; i < this.markedPoints.length; i++) {
+                    if (this.markedPoints[i] == 0) bareScore += this.contents[i];
+                }
+
+                return bareScore * lastPlay;
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Day four</h1>
+    <p>Challenge can be found <a href="https://adventofcode.com/2021/day/4">here</a>.</p>
+
+    <label for="input-text" name="input-text" rows="20" cols="50">Paste the input here:</label>
+    <textarea id="input-text"></textarea>
+
+    <h2>Part one</h2>
+    <p>Find the score of the winning bingo board.</p>
+    <button id="part-one-button" name="part-one-button" onclick="calculatePartOne()">Calculate</button>
+    <p>Result:</p>
+    <p class="result" id="part-one-result">Not calculated yet</p>
+
+    <h2>Part two</h2>
+    <p>Determine the oxygen and C02 ratings.</p>
+    <button id="part-two-button" name="part-two-button" onclick="calculatePartTwo()">Calculate</button>
+    <p>Result:</p>
+    <p class="result" id="part-two-result">Not calculated yet</p>
+</body>
+
+</html>
