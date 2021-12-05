@@ -4,3 +4,10 @@ function splitTextarea(textareaId) {
     let lines = allText.split(/\r?\n/);
     return lines;
 }
+
+function persistTextarea() {
+    let textarea = document.getElementById('input-text');
+    let allText = textarea.value;
+    sessionStorage.removeItem('puzzle-input');
+    sessionStorage.setItem('puzzle-input', allText);
+}

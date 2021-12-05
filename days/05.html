@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <link rel="stylesheet" href="../css/advent_of_code_style.css">
+    <script type="text/javascript" src="../src/data_helpers.js"></script>
+
+    <script>
+        function calculate(outputId, ignoreDiagonals = true) {
+            var allLines = getAllLines();
+
+            if (ignoreDiagonals) allLines = allLines.filter(line => !line.isDiagonal());
+
+            var plane = new Plane(allLines);
+
+            for (const line of allLines) {
+                plane.markLine(line);
+            }
+
+            console.log(plane);
+            console.log(plane.score());
+
+            var result = document.getElementById(outputId);
+            result.innerText = plane.score();
+        }
+
+        function getAllLines(puzzleInput) {
+            var lines = [];
+
+            for (const line of splitTextarea('input-text')) {
+                lines.push(new Line(line));
+            }
+
+            return lines;
+        }
+
+        class Line {
+            constructor(stringInput) {
+                var segments = stringInput.trim().split(' -> ');
+                this.startCoordinates = segments[0].split(',').map(Number);
+                this.endCoordinates = segments[1].split(',').map(Number);
+            }
+
+            isDiagonal() {
+                return (this.startCoordinates[0] != this.endCoordinates[0] && this.startCoordinates[1] != this.endCoordinates[1]);
+            }
+        }
+
+        class Plane {
+            constructor(listOfLines) {
+                var maxHorizontalSize = 0;
+                var maxVerticalSize = 0;
+
+                for (const line of listOfLines) {
+                    if (line.startCoordinates[0] > maxHorizontalSize) maxHorizontalSize = line.startCoordinates[0];
+                    if (line.endCoordinates[0] > maxHorizontalSize) maxHorizontalSize = line.endCoordinates[0];
+                    if (line.startCoordinates[1] > maxVerticalSize) maxVerticalSize = line.startCoordinates[1];
+                    if (line.endCoordinates[1] > maxVerticalSize) maxVerticalSize = line.endCoordinates[1];
+                }
+
+                var row = new Array(maxHorizontalSize + 1).fill(0);
+                this.points = [];
+                for (var i = 0; i < maxVerticalSize + 1; i++) {
+                    this.points.push([...row]);
+                }
+            }
+
+            markLine(line) {
+                var xDirection = line.endCoordinates[0] > line.startCoordinates[0] ? 1 : -1;
+                var yDirection = line.endCoordinates[1] > line.startCoordinates[1] ? 1 : -1;
+
+                if (line.endCoordinates[0] == line.startCoordinates[0]) xDirection = 0;
+                if (line.endCoordinates[1] == line.startCoordinates[1]) yDirection = 0;
+
+                var currentPosition = [line.startCoordinates[0], line.startCoordinates[1]];
+
+                while (currentPosition[0] != line.endCoordinates[0] || currentPosition[1] != line.endCoordinates[1]) {
+                    this.points[currentPosition[1]][currentPosition[0]] += 1;
+                    currentPosition[0] += xDirection;
+                    currentPosition[1] += yDirection;
+                }
+
+                this.points[currentPosition[1]][currentPosition[0]] += 1;
+            }
+
+            score() {
+                var returnScore = 0;
+                for (var y = 0; y < this.points.length; y++) {
+                    for (var x = 0; x < this.points[y].length; x++) {
+                        if (this.points[y][x] > 1) returnScore++;
+                    }
+                }
+
+                return returnScore;
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Day five</h1>
+    <p>Challenge can be found <a href="https://adventofcode.com/2021/day/5">here</a>.</p>
+
+    <label for="input-text" name="input-text" rows="20" cols="50">Paste the input here:</label>
+    <textarea id="input-text" onchange="persistTextarea()"></textarea>
+
+    <h2>Part one</h2>
+    <p>Find out how many points on which vertical and horizontal lines overlap.</p>
+    <button id="part-one-button" name="part-one-button" onclick="calculate('part-one-result')">Calculate</button>
+    <p>Result:</p>
+    <p class="result" id="part-one-result">Not calculated yet</p>
+
+    <h2>Part two</h2>
+    <p>Now we account for diagonals.</p>
+    <button id="part-two-button" name="part-two-button" onclick="calculate('part-two-result', false)">Calculate</button>
+    <p>Result:</p>
+    <p class="result" id="part-two-result">Not calculated yet</p>
+</body>
+
+<script>
+    function restoreTextarea() {
+        let textarea = document.getElementById('input-text');
+        let savedText = sessionStorage.getItem('puzzle-input');
+        if (savedText) textarea.value = savedText;
+    }
+    window.onLoad = restoreTextarea();
+</script>
+
+</html>
